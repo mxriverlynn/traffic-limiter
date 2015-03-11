@@ -1,6 +1,6 @@
 {
   "name": "traffic-limiter",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Limit the number of tasks being run, based on task key/type",
   "main": "limiter/index.js",
   "scripts": {
