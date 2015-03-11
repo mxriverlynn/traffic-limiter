@@ -1,0 +1,36 @@
+{
+  "name": "traffic-limiter",
+  "version": "0.0.1",
+  "description": "Limit the number of tasks being run, based on task key/type",
+  "main": "limiter/index.js",
+  "scripts": {
+    "test": "grunt jasmine_node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/derickbailey/traffic-limiter"
+  },
+  "keywords": [
+    "queue",
+    "limit",
+    "rate",
+    "limit",
+    "limiter",
+    "task",
+    "bottleneck",
+    "runner"
+  ],
+  "author": "Derick Bailey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/derickbailey/traffic-limiter/issues"
+  },
+  "homepage": "https://github.com/derickbailey/traffic-limiter",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-jasmine-node": "^0.2.1",
+    "node-jasmine-async": "^0.1.0"
+  }
+}
