@@ -71,4 +71,34 @@ describe("rate limit based on type", function(){
     });
   });
 
+  describe("when a task of a specified type is completed", function(){
+    var tasks;
+
+    beforeEach(function(){
+      var d1;
+
+      tasks = [];
+      limiter = new Limiter(config);
+
+      limiter.run(type, function(done){
+        tasks.push(1);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(2);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(3);
+      });
+
+      limiter.complete(type);
+    });
+
+    it("should run the next available task", function(){
+      expect(tasks.length).toBe(3);
+      expect(tasks[2]).toBe(3);
+    });
+  });
+
 });

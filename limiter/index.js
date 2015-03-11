@@ -47,6 +47,13 @@ Limiter.prototype.inProgress = function(type){
   return counter.inProgress;
 };
 
+Limiter.prototype.complete = function(type){
+  var counter = this._getCounter(type);
+  counter.decrement();
+
+  this._checkQueue(type);
+};
+
 // Private API
 // -----------
 
@@ -57,8 +64,7 @@ Limiter.prototype._runTask = function(type, cb){
   counter.increment();
 
   function done(){
-    counter.decrement();
-    that._checkQueue(type);
+    that.complete(type);
   }
 
   cb(done);

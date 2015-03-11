@@ -34,6 +34,24 @@ limiter.run("foo", function(done){
 });
 ```
 
+### Complete A Task By Type
+
+Sometimes you don't have access to the `done` method from the
+`run` callback. In those cases, you can say a task of a specific
+type was completed:
+
+```js
+limiter.run("foo", function(){
+  // do stuff
+});
+
+// later on
+limiter.complete("foo");
+```
+
+This will decrement the in-progress tasks for the specified 
+type, allowing another task to run if needed.
+
 ### Update Limits
 
 You can update the limits any time you want by calling the
