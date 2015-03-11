@@ -63,6 +63,28 @@ limiter.updateLimits({
 });
 ```
 
+### Unlimited Tasks
+
+If you would like to have unlimited tasks running, set the
+limit for the type to any number below zero, such as `-1`.
+
+```js
+limiter.updateLimits({
+  foo: -1
+});
+```
+
+### Stop Running Tasks For A Type
+
+If you want to prevent tasks from running at all, for a given
+type, set the limit to zero (`0`).
+
+```js
+limiter.updateLimits({
+  foo: 0
+});
+```
+
 ## Legal Junk
 
 Traffic-Limiter is &copy;2015 Muted Solutions, LLC. All Rights Reserved.

@@ -7,6 +7,64 @@ describe("rate limit based on type", function(){
   var config = {};
   config[type] = limit;
 
+  describe("when a limit is set to zero (0)", function(){
+    var tasks;
+
+    beforeEach(function(){
+      tasks = [];
+      var config = {};
+      config[type] = 0;
+      limiter = new Limiter(config);
+
+      limiter.run(type, function(done){
+        tasks.push(1);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(2);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(3);
+      });
+    });
+
+    it("should not run any tasks", function(){
+      expect(limiter.inProgress(type)).toBe(0);
+      expect(tasks.length).toBe(0);
+    });
+
+  });
+
+  describe("when a limit is set below zero (0)", function(){
+    var tasks;
+
+    beforeEach(function(){
+      tasks = [];
+      var config = {};
+      config[type] = -1;
+      limiter = new Limiter(config);
+
+      limiter.run(type, function(done){
+        tasks.push(1);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(2);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(3);
+      });
+    });
+
+    it("should run all tasks", function(){
+      expect(limiter.inProgress(type)).toBe(3);
+      expect(tasks.length).toBe(3);
+    });
+
+  });
+
   describe("when more tasks are run than are allowed by the type", function(){
     var tasks;
 
@@ -27,7 +85,7 @@ describe("rate limit based on type", function(){
       });
     });
 
-    it("should run as many tasks as are configured", function(){
+    it("should run as many tasks as are allowed", function(){
       expect(tasks[0]).toBe(1);
       expect(tasks[1]).toBe(2);
     });

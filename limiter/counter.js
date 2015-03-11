@@ -4,7 +4,7 @@
 function Counter(limit){
   this.inProgress = 0;
   this.limit = limit;
-  this.isAtLimit = false;
+  this._checkLimit();
 }
 
 // Public API
@@ -31,7 +31,11 @@ Counter.prototype.decrement = function(){
 // -----------
 
 Counter.prototype._checkLimit = function(){
-  this.isAtLimit = (this.inProgress >= this.limit);
+  if (this.limit < 0){
+    this.isAtLimit = false;
+  } else {
+    this.isAtLimit = (this.inProgress >= this.limit);
+  }
 };
 
 // Exports 
