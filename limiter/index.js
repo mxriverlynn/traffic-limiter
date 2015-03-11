@@ -26,6 +26,9 @@ Limiter.prototype.run = function(type, cb){
 };
 
 Limiter.prototype.updateLimits = function(config){
+  var isObject = (typeof config === "object");
+  if (!isObject){ return; }
+
   var that = this;
 
   Object.keys(config).forEach(function(type){
