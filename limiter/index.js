@@ -34,11 +34,11 @@ Limiter.prototype.updateLimits = function(config){
   Object.keys(config).forEach(function(type){
     var limit = config[type];
 
-    var counter = new Counter(limit);
-    that._counters.register(type, counter);
+    var counter = that._getOrCreateCounter(type, limit);
+    counter.setLimit(limit);
 
-    var queue = new Queue();
-    that._queues.register(type, queue);
+    that._getOrCreateQueue(type);
+    that._checkQueue(type);
   });
 };
 
@@ -89,6 +89,32 @@ Limiter.prototype._getCounter = function(type){
 
 Limiter.prototype._getQueue = function(type){
   return this._queues.get(type);
+};
+
+Limiter.prototype._getOrCreateCounter = function(type, limit){
+  var counter;
+
+  if (this._counters.hasValue(type)){
+    counter = this._counters.get(type);
+  } else {
+    counter = new Counter(limit);
+    this._counters.register(type, counter);
+  }
+
+  return counter;
+};
+
+Limiter.prototype._getOrCreateQueue = function(type){
+  var queue;
+
+  if (this._queues.hasValue(type)){
+    queue = this._queues.get(type);
+  } else {
+    queue = new Queue();
+    this._queues.register(type, queue);
+  }
+
+  return queue;
 };
 
 // Exports

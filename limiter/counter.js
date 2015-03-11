@@ -27,6 +27,11 @@ Counter.prototype.decrement = function(){
   this._checkLimit();
 };
 
+Counter.prototype.setLimit = function(limit){
+  this.limit = limit;
+  this._checkLimit();
+};
+
 // Private API
 // -----------
 
