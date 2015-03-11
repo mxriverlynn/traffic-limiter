@@ -63,6 +63,20 @@ limiter.updateLimits({
 });
 ```
 
+### Update The In-Progress Count
+
+There may be times when you have to pre-set or reset the current in-progress
+count for a given task type. If you need to do this you can use the `updateInProgress`
+method.
+
+```js
+limiter.updateInProgress({
+  foo: 5
+});
+```
+
+Changing this will immediately check to see if more tasks can run.
+
 ### Unlimited Tasks
 
 If you would like to have unlimited tasks running, set the

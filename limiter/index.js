@@ -42,6 +42,22 @@ Limiter.prototype.updateLimits = function(config){
   });
 };
 
+Limiter.prototype.updateInProgress = function(config){
+  var isObject = (typeof config === "object");
+  if (!isObject){ return; }
+
+  var that = this;
+
+  Object.keys(config).forEach(function(type){
+    var inProgressCount = config[type];
+
+    var counter = that._getCounter(type);
+    counter.setInProgress(inProgressCount);
+
+    that._checkQueue(type);
+  });
+};
+
 Limiter.prototype.inProgress = function(type){
   var counter = this._getCounter(type);
   return counter.inProgress;

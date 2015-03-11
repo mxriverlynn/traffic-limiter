@@ -159,4 +159,35 @@ describe("rate limit based on type", function(){
     });
   });
 
+  describe("when the in-progress count for a type is manually set, and tasks are run", function(){
+    var tasks;
+
+    beforeEach(function(){
+      var d1;
+
+      tasks = [];
+      limiter = new Limiter(config);
+
+      var updateConfig = {};
+      updateConfig[type] = 1;
+      limiter.updateInProgress(updateConfig);
+
+      limiter.run(type, function(done){
+        tasks.push(1);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(2);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(3);
+      });
+    });
+
+    it("should include the manual in-progress update when determine how many steps can run now", function(){
+      expect(tasks.length).toBe(1);
+    });
+  });
+
 });

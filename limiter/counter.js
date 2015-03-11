@@ -32,6 +32,11 @@ Counter.prototype.setLimit = function(limit){
   this._checkLimit();
 };
 
+Counter.prototype.setInProgress = function(inProgress){
+  this.inProgress = inProgress;
+  this._checkLimit();
+};
+
 // Private API
 // -----------
 
