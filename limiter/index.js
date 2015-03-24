@@ -1,29 +1,25 @@
 var Registry = require("./registry");
-var Counter = require("./counter");
 var Queue = require("./queue");
 
 // Limiter
 // ----------
 
 function Limiter(config){
-  this._counters = new Registry();
   this._queues = new Registry();
-
   this.updateLimits(config);
 }
 
-// Public Methods
-// --------------
+// Primary API
+// -----------
 
 Limiter.prototype.run = function(type, cb){
-  var counter = this._getCounter(type);
-
-  if (counter.isAtLimit) {
-    this._queueForLater(type, cb);
-  } else {
-    this._runTask(type, cb);
-  }
+  var queue = this._getQueue(type);
+  queue.push(cb);
+  this._checkQueue(type);
 };
+
+// Configuration API
+// -----------------
 
 Limiter.prototype.updateLimits = function(config){
   var isObject = (typeof config === "object");
@@ -34,10 +30,9 @@ Limiter.prototype.updateLimits = function(config){
   Object.keys(config).forEach(function(type){
     var limit = config[type];
 
-    var counter = that._getOrCreateCounter(type, limit);
-    counter.setLimit(limit);
+    var queue = that._getQueue(type);
+    queue.setLimit(limit);
 
-    that._getOrCreateQueue(type);
     that._checkQueue(type);
   });
 };
@@ -51,22 +46,21 @@ Limiter.prototype.updateInProgress = function(config){
   Object.keys(config).forEach(function(type){
     var inProgressCount = config[type];
 
-    var counter = that._getCounter(type);
-    counter.setInProgress(inProgressCount);
+    var queue = that._getQueue(type);
+    queue.setInProgress(inProgressCount);
 
     that._checkQueue(type);
   });
 };
 
 Limiter.prototype.inProgress = function(type){
-  var counter = this._getCounter(type);
-  return counter.inProgress;
+  var queue = this._getQueue(type);
+  return queue.inProgress;
 };
 
 Limiter.prototype.complete = function(type){
-  var counter = this._getCounter(type);
-  counter.decrement();
-
+  var queue = this._getQueue(type);
+  queue.decrement();
   this._checkQueue(type);
 };
 
@@ -76,8 +70,8 @@ Limiter.prototype.complete = function(type){
 Limiter.prototype._runTask = function(type, cb){
   var that = this;
 
-  var counter = this._getCounter(type);
-  counter.increment();
+  var queue = this._getQueue(type);
+  queue.increment();
 
   function done(){
     that.complete(type);
@@ -86,41 +80,20 @@ Limiter.prototype._runTask = function(type, cb){
   cb(done);
 };
 
-Limiter.prototype._queueForLater = function(type, cb){
-  var queue = this._getQueue(type);
-  queue.push(cb);
-};
-
 Limiter.prototype._checkQueue = function(type){
   var queue = this._getQueue(type);
+
+  if (queue.isAtLimit){
+    return;
+  }
+
   var task = queue.next();
   if (task){
     this._runTask(type, task);
   }
 };
 
-Limiter.prototype._getCounter = function(type){
-  return this._counters.get(type);
-};
-
 Limiter.prototype._getQueue = function(type){
-  return this._queues.get(type);
-};
-
-Limiter.prototype._getOrCreateCounter = function(type, limit){
-  var counter;
-
-  if (this._counters.hasValue(type)){
-    counter = this._counters.get(type);
-  } else {
-    counter = new Counter(limit);
-    this._counters.register(type, counter);
-  }
-
-  return counter;
-};
-
-Limiter.prototype._getOrCreateQueue = function(type){
   var queue;
 
   if (this._queues.hasValue(type)){
