@@ -1,14 +1,13 @@
 var Limiter = require("../limiter");
 
 describe("rate limit based on type", function(){
-  var limiter;
   var type = "some type";
   var limit = 2;
   var config = {};
   config[type] = limit;
 
   describe("when a limit is set to zero (0)", function(){
-    var tasks;
+    var limiter, tasks;
 
     beforeEach(function(){
       tasks = [];
@@ -37,7 +36,7 @@ describe("rate limit based on type", function(){
   });
 
   describe("when a limit is set below zero (0)", function(){
-    var tasks;
+    var limiter, tasks;
 
     beforeEach(function(){
       tasks = [];
@@ -66,7 +65,7 @@ describe("rate limit based on type", function(){
   });
 
   describe("when more tasks are run than are allowed by the type", function(){
-    var tasks;
+    var limiter, tasks;
 
     beforeEach(function(){
       tasks = [];
@@ -98,7 +97,7 @@ describe("rate limit based on type", function(){
   });
 
   describe("when tasks are queues up for later work, and the in progress count drops below the limit", function(){
-    var tasks;
+    var limiter, tasks;
 
     beforeEach(function(){
       var d1;
@@ -130,7 +129,7 @@ describe("rate limit based on type", function(){
   });
 
   describe("when a specified ticket is completed", function(){
-    var tasks;
+    var limiter, tasks;
 
     beforeEach(function(){
       var d1;
@@ -160,42 +159,36 @@ describe("rate limit based on type", function(){
   });
 
   describe("when a ticket for work that is not yet running is completed", function(){
-    var tasks;
+    var limiter, ticket;
 
     beforeEach(function(){
       var d1;
 
-      tasks = [];
+      config[type] = 0;
       limiter = new Limiter(config);
 
-      var ticket = limiter.run(type, function(done){
-        tasks.push(1);
-      });
-
-      limiter.run(type, function(done){
-        tasks.push(2);
-      });
-
-      limiter.run(type, function(done){
-        tasks.push(3);
-      });
+      limiter.run(type, function(done){});
+      limiter.run(type, function(done){});
+      ticket = limiter.run(type, function(done){});
 
       limiter.complete(ticket);
     });
 
     it("should remove the work from the queue", function(){
-      throw new Error("not implemented");
+      var hasTicket = limiter.hasWork(type, ticket);
+      expect(hasTicket).toBe(false);
     });
   });
 
 
   describe("when the in-progress count for a type is manually set, and tasks are run", function(){
-    var tasks;
+    var limiter, tasks;
 
     beforeEach(function(){
       var d1;
 
       tasks = [];
+      config[type] = 2;
       limiter = new Limiter(config);
 
       var updateConfig = {};

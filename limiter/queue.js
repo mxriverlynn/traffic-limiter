@@ -23,6 +23,28 @@ Queue.prototype.clone = function(){
   return this.values.slice(0);
 };
 
+Queue.prototype.findIndexByTicketId = function(ticketId){
+  var ticket, idx;
+
+  for(var i=0; i<this.values.length; i++){
+    ticket = this.values[i];
+    if (!ticket) { continue; }
+
+    if (ticket.id === ticketId){
+      idx = i;
+      break;
+    }
+  }
+
+  return idx;
+};
+
+Queue.prototype.removeTicketAt = function(idx){
+  if (idx > -1){
+    this.values.splice(idx, 1);
+  }
+};
+
 Object.defineProperty(Queue.prototype, "length", {
   get: function(){
     return this.values.length;
@@ -46,6 +68,15 @@ Object.defineProperty(Queue.prototype, "isAtLimit", {
   }
 });
 
+Queue.prototype.complete = function(ticket){
+  this.decrement();
+
+  if (!ticket){ return; }
+
+  var idx = this.findIndexByTicketId(ticket.id);
+  this.removeTicketAt(idx);
+};
+
 Queue.prototype.increment = function(){
   this.inProgress += 1;
 };
@@ -63,6 +94,18 @@ Queue.prototype.setLimit = function(limit){
 
 Queue.prototype.setInProgress = function(inProgress){
   this.inProgress = inProgress;
+};
+
+Queue.prototype.hasWork = function(ticketId){
+  var hasWork = false;
+
+  this.values.forEach(function(ticket){
+    if (ticket.id === ticketId){
+      hasWork = true;
+    }
+  });
+
+  return hasWork;
 };
 
 module.exports = Queue;

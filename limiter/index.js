@@ -66,8 +66,18 @@ Limiter.prototype.inProgress = function(type){
 Limiter.prototype.complete = function(ticket){
   if (!ticket) { return; }
   var queue = this._getQueue(ticket.type);
-  queue.decrement();
+  queue.complete(ticket);
   this._checkQueue(queue);
+};
+
+Limiter.prototype.hasWork = function(type, ticket){
+  var queue = this._getQueue(type);
+  if (!queue){
+    return false;
+  }
+
+  var hasWork = queue.hasWork(ticket.id);
+  return hasWork;
 };
 
 // Private API
