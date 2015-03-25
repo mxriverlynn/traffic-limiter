@@ -23,6 +23,23 @@ Limiter.prototype.run = function(type, cb){
   return ticket;
 };
 
+Limiter.prototype.complete = function(ticket){
+  if (!ticket) { return; }
+  var queue = this._getQueue(ticket.type);
+  queue.complete(ticket);
+  this._checkQueue(queue);
+};
+
+Limiter.prototype.hasWork = function(type, ticket){
+  var queue = this._getQueue(type);
+  if (!queue){
+    return false;
+  }
+
+  var hasWork = queue.hasWork(ticket.id);
+  return hasWork;
+};
+
 // Configuration API
 // -----------------
 
@@ -61,23 +78,6 @@ Limiter.prototype.updateInProgress = function(config){
 Limiter.prototype.inProgress = function(type){
   var queue = this._getQueue(type);
   return queue.inProgress;
-};
-
-Limiter.prototype.complete = function(ticket){
-  if (!ticket) { return; }
-  var queue = this._getQueue(ticket.type);
-  queue.complete(ticket);
-  this._checkQueue(queue);
-};
-
-Limiter.prototype.hasWork = function(type, ticket){
-  var queue = this._getQueue(type);
-  if (!queue){
-    return false;
-  }
-
-  var hasWork = queue.hasWork(ticket.id);
-  return hasWork;
 };
 
 // Private API

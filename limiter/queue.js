@@ -72,6 +72,9 @@ Queue.prototype.complete = function(ticket){
   this.decrement();
 
   if (!ticket){ return; }
+  
+  var hasId = ("id" in ticket);
+  if (!hasId){ return; }
 
   var idx = this.findIndexByTicketId(ticket.id);
   this.removeTicketAt(idx);
