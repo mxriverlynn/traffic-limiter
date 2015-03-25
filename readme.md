@@ -34,19 +34,20 @@ limiter.run("foo", function(done){
 });
 ```
 
-### Complete A Task By Type
+### Complete A Task With A Ticket
 
 Sometimes you don't have access to the `done` method from the
-`run` callback. In those cases, you can say a task of a specific
-type was completed:
+`run` callback. In those cases, you can say a specific task
+was completed, by using the "ticket" that is returned from the
+`run` method:
 
 ```js
-limiter.run("foo", function(){
+var ticket = limiter.run("foo", function(){
   // do stuff
 });
 
 // later on
-limiter.complete("foo");
+limiter.complete(ticket);
 ```
 
 This will decrement the in-progress tasks for the specified 

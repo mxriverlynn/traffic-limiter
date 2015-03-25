@@ -159,6 +159,36 @@ describe("rate limit based on type", function(){
     });
   });
 
+  describe("when a ticket for work that is not yet running is completed", function(){
+    var tasks;
+
+    beforeEach(function(){
+      var d1;
+
+      tasks = [];
+      limiter = new Limiter(config);
+
+      var ticket = limiter.run(type, function(done){
+        tasks.push(1);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(2);
+      });
+
+      limiter.run(type, function(done){
+        tasks.push(3);
+      });
+
+      limiter.complete(ticket);
+    });
+
+    it("should remove the work from the queue", function(){
+      throw new Error("not implemented");
+    });
+  });
+
+
   describe("when the in-progress count for a type is manually set, and tasks are run", function(){
     var tasks;
 
