@@ -1,5 +1,6 @@
 var Registry = require("./registry");
 var Queue = require("./queue");
+var Tickets = require("./tickets");
 
 // Limiter
 // ----------
@@ -13,9 +14,13 @@ function Limiter(config){
 // -----------
 
 Limiter.prototype.run = function(type, cb){
+  var ticket = Tickets.get(type, cb);
+
   var queue = this._getQueue(type);
-  queue.push(cb);
-  this._checkQueue(type);
+  queue.push(ticket);
+  this._checkQueue(queue);
+
+  return ticket;
 };
 
 // Configuration API
@@ -33,7 +38,7 @@ Limiter.prototype.updateLimits = function(config){
     var queue = that._getQueue(type);
     queue.setLimit(limit);
 
-    that._checkQueue(type);
+    that._checkQueue(queue);
   });
 };
 
@@ -49,7 +54,7 @@ Limiter.prototype.updateInProgress = function(config){
     var queue = that._getQueue(type);
     queue.setInProgress(inProgressCount);
 
-    that._checkQueue(type);
+    that._checkQueue(queue);
   });
 };
 
@@ -58,38 +63,35 @@ Limiter.prototype.inProgress = function(type){
   return queue.inProgress;
 };
 
-Limiter.prototype.complete = function(type){
-  var queue = this._getQueue(type);
+Limiter.prototype.complete = function(ticket){
+  if (!ticket) { return; }
+  var queue = this._getQueue(ticket.type);
   queue.decrement();
-  this._checkQueue(type);
+  this._checkQueue(queue);
 };
 
 // Private API
 // -----------
 
-Limiter.prototype._runTask = function(type, cb){
+Limiter.prototype._runTask = function(queue, ticket){
   var that = this;
-
-  var queue = this._getQueue(type);
   queue.increment();
 
   function done(){
-    that.complete(type);
+    that.complete(ticket);
   }
 
-  cb(done);
+  ticket.work(done);
 };
 
-Limiter.prototype._checkQueue = function(type){
-  var queue = this._getQueue(type);
-
+Limiter.prototype._checkQueue = function(queue){
   if (queue.isAtLimit){
     return;
   }
 
-  var task = queue.next();
-  if (task){
-    this._runTask(type, task);
+  var ticket = queue.next();
+  if (ticket){
+    this._runTask(queue, ticket);
   }
 };
 

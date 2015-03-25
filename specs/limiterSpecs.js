@@ -129,7 +129,7 @@ describe("rate limit based on type", function(){
     });
   });
 
-  describe("when a task of a specified type is completed", function(){
+  describe("when a specified ticket is completed", function(){
     var tasks;
 
     beforeEach(function(){
@@ -138,7 +138,7 @@ describe("rate limit based on type", function(){
       tasks = [];
       limiter = new Limiter(config);
 
-      limiter.run(type, function(done){
+      var ticket = limiter.run(type, function(done){
         tasks.push(1);
       });
 
@@ -150,7 +150,7 @@ describe("rate limit based on type", function(){
         tasks.push(3);
       });
 
-      limiter.complete(type);
+      limiter.complete(ticket);
     });
 
     it("should run the next available task", function(){
